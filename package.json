@@ -1,0 +1,15 @@
+{
+  "name": "snyker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": "bin/snyker",
+  "license": "UNLICENSED",
+  "scripts": {
+    "snyker": "bin/snyker"
+  },
+  "dependencies": {
+    "@yarnpkg/lockfile": "^1.1.0",
+    "js-yaml": "^3.13.1",
+    "snyk": "^1.251.0"
+  }
+}
