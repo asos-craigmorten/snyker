@@ -2,9 +2,7 @@
 
 _You're not you when you've got hundreds of vulnerable paths..._
 
-<p style="text-align: center">
-  <img alt="A Chocolate Snack" src="./snack.png">
-</p>
+![A Chocolate Snack](./snack.png)
 
 Icon made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>.
 
@@ -24,6 +22,23 @@ This tool also does not make use of `snyk`'s ability to perform upgrades or patc
 
 This project isn't worthy of being a "proper" `npm` package, but can still be run as follows:
 
-```console
-TBD
-```
+1. With `npx`:
+
+   ```console
+   npx https://github.com/asos-craigmorten/snyker
+   ```
+
+1. Cloning + `npx`:
+
+   ```console
+   git clone git@github.com:asos-craigmorten/snyker.git
+   npx ./snyker
+   ```
+
+1. Cloning + `yarn`:
+
+   ```console
+   git clone git@github.com:asos-craigmorten/snyker.git
+   yarn add ./snyker --dev
+   yarn snyker
+   ```
