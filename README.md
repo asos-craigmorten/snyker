@@ -16,7 +16,7 @@ This single command CLI takes a brute-force approach to solving this downfall of
 
 Note that this tool obeys your defined package version ranges, thus can't fix anything that requires say a major upgrade if you are only permitting minor or patch upgrades.
 
-This tool also does not make use of `snyk`'s ability to perform upgrades or patches. It will simply ignore vulnerabilites that cannot be fixed in the above manner. It is on you to sanity check anything that this tool decides to ignore.
+This tool also does not make use of `snyk`'s ability to perform upgrades or patches. It will simply ignore vulnerabilites that cannot be fixed in the above manner. _It is on you to sanity check anything that this tool decides to ignore._ We recommend that you see what removing the "ignored" snyk policies and running the `snyk wizard --dev` yeilds as it may suggest patches or major upgrades that this tool doesn't consider.
 
 ## Usage
 
@@ -42,3 +42,10 @@ This project isn't worthy of being a "proper" `npm` package, but can still be ru
    yarn add ./snyker --dev
    yarn snyker
    ```
+
+And then after running, perhaps perform:
+
+```console
+rm .snyk
+snyk wizard --dev
+```
