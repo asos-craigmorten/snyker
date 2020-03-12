@@ -5,11 +5,13 @@
   "bin": "bin/snyker",
   "license": "UNLICENSED",
   "scripts": {
-    "snyker": "bin/snyker"
+    "snyker": "bin/snyker",
+    "snyker:npm": "bin/snyker --lockfile=package-lock.json"
   },
   "dependencies": {
     "@yarnpkg/lockfile": "^1.1.0",
     "js-yaml": "^3.13.1",
-    "snyk": "^1.251.0"
+    "snyk": "^1.251.0",
+    "yargs": "^15.3.0"
   }
 }

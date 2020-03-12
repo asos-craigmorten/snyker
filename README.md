@@ -20,12 +20,22 @@ This tool also does not make use of `snyk`'s ability to perform upgrades or patc
 
 ## Usage
 
-This project isn't worthy of being a "proper" `npm` package, but can still be run as follows:
+This project isn't currently worthy of being a "proper" `npm` package, but can still be run as follows:
 
-1. With `npx`:
+1. With `npx` (by default will assume to try and use a `yarn.lock` in the current working directory):
 
    ```console
    npx https://github.com/asos-craigmorten/snyker
+   ```
+
+1. With `npx` specifying a lockfile:
+
+   ```console
+   # When using Yarn in a project
+   npx https://github.com/asos-craigmorten/snyker --lockfile yarn.lock
+
+   # When using plain NPM in a project
+   npx https://github.com/asos-craigmorten/snyker --lockfile package-lock.json
    ```
 
 1. Cloning + `npx`:
