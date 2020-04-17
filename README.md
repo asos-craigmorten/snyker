@@ -59,3 +59,8 @@ And then after running, perhaps perform:
 rm .snyk
 snyk wizard --dev
 ```
+
+## Options
+
+- `--verbose` Will log out the stdout / stderr of all commands that are executed internally. Default: `false`.
+- `--retries <int>` Will set the number of times to retry logical steps of Snyker. Default: `2`.
