@@ -3,6 +3,30 @@ const fs = require("fs");
 const lockfile = require("@yarnpkg/lockfile");
 const { argv } = require("yargs");
 
+const DEFAULT_RETRIES = 2;
+const DEFAULT_VERBOSE = false;
+
+let MAX_RETRIES;
+let VERBOSE;
+
+const catchAndRetry = async (fn) => {
+  for (let retries = 0; retries < MAX_RETRIES; retries++) {
+    try {
+      return await fn();
+    } catch (e) {
+      console.log("An error was thrown while executing the previous command.");
+      console.error(e);
+    }
+
+    if (retries < MAX_RETRIES - 1) {
+      console.log("Retrying...");
+    }
+  }
+
+  console.log("Exiting...");
+  process.exit(1);
+};
+
 const exec = (...args) => {
   let stdout = "";
   let stderr = "";
@@ -10,21 +34,33 @@ const exec = (...args) => {
   return new Promise((resolve, reject) => {
     const child = spawn(...args);
 
-    child.stdout.on("data", data => (stdout = `${stdout}${data}`));
-    child.stderr.on("data", data => (stderr = `${stderr}${data}`));
-    child.on("error", error => reject({ error, stdout, stderr }));
-    child.on("close", code => resolve({ code, stdout, stderr }));
+    child.stdout.on("data", (data) => (stdout = `${stdout}${data}`));
+    child.stderr.on("data", (data) => (stderr = `${stderr}${data}`));
+    child.on("error", (error) => {
+      if (VERBOSE) {
+        console.log({ error, stdout, stderr });
+      }
+
+      return reject({ error, stdout, stderr });
+    });
+    child.on("close", (code) => {
+      if (VERBOSE) {
+        console.log({ code, stdout, stderr });
+      }
+
+      return resolve({ code, stdout, stderr });
+    });
   });
 };
 
-const toVersionless = str => str.replace(/(.*)\@.*/, "$1");
+const toVersionless = (str) => str.replace(/(.*)\@.*/, "$1");
 
 const toDependencies = (
   currentDependencies,
   { from: [_, ...dependencies] }
 ) => [...currentDependencies, ...dependencies.map(toVersionless)];
 
-const unique = arr => Array.from(new Set([...arr]));
+const unique = (arr) => Array.from(new Set([...arr]));
 
 const toId = ({ id }) => id;
 
@@ -60,7 +96,11 @@ const updateYarnLock = async ({ lockFileName, depsToForceUpdate }) => {
     "Running 'yarn install --force' to force sub-dependency updates..."
   );
 
-  await yarnInstall({ force: true });
+  const out = await yarnInstall({ force: true });
+
+  if (out.code !== 0) {
+    throw out;
+  }
 };
 
 /**
@@ -84,23 +124,36 @@ const updatePackageLock = async ({ lockFileName, depsToForceUpdate }) => {
           ? currentJson
           : { ...currentJson, [dependencyName]: dependencyMetadata },
       {}
-    )
+    ),
   };
 
   fs.writeFileSync(lockFileName, JSON.stringify(updatedPackageLock));
 
   console.log("Running 'npm install' to force sub-dependency updates...");
 
-  await npmInstall();
+  const out = await npmInstall();
+
+  if (out.code !== 0) {
+    throw out;
+  }
 };
 
 const snyker = async () => {
+  MAX_RETRIES = argv.retries || DEFAULT_RETRIES;
+  VERBOSE = argv.verbose || DEFAULT_VERBOSE;
+
   const lockFileName = argv.lockfile || "yarn.lock";
   const isYarn = lockFileName.includes("yarn");
 
-  console.log(`Ensuring lockfile '${lockFileName}' is up to date...`);
+  await catchAndRetry(async () => {
+    console.log(`Ensuring lockfile '${lockFileName}' is up to date...`);
 
-  await (isYarn ? yarnInstall : npmInstall)();
+    const out = await (isYarn ? yarnInstall : npmInstall)();
+
+    if (out.code !== 0) {
+      throw out;
+    }
+  });
 
   console.log("Deleting '.snyk' file...");
 
@@ -108,36 +161,53 @@ const snyker = async () => {
     fs.unlinkSync(".snyk");
   } catch (_) {}
 
-  console.log("Getting vulnerable paths from snyk...");
+  const depsToForceUpdate = await catchAndRetry(async () => {
+    console.log("Getting vulnerable paths from snyk...");
 
-  const { stdout: snykTestOut } = await exec(`snyk`, [
-    "test",
-    "--dev",
-    "--json",
-    `--file=${lockFileName}`
-  ]);
+    const { stdout: snykTestOut } = await exec(`snyk`, [
+      "test",
+      "--dev",
+      "--json",
+      `--file=${lockFileName}`,
+    ]);
 
-  const { vulnerabilities } = JSON.parse(snykTestOut);
+    const { vulnerabilities, error } = JSON.parse(snykTestOut);
 
-  const depsToForceUpdate = unique(vulnerabilities.reduce(toDependencies, []));
+    if (error) {
+      throw error;
+    }
 
-  await (isYarn ? updateYarnLock : updatePackageLock)({
-    lockFileName,
-    depsToForceUpdate
+    return unique(vulnerabilities.reduce(toDependencies, []));
   });
 
-  console.log("Getting remaining vulnerable paths from snyk...");
-
-  const { stdout: finalSnykTestOut } = await exec(`snyk`, [
-    "test",
-    "--dev",
-    "--json",
-    `--file=${lockFileName}`
-  ]);
-
-  const { vulnerabilities: finalVulnerabilities } = JSON.parse(
-    finalSnykTestOut
+  await catchAndRetry(
+    async () =>
+      await (isYarn ? updateYarnLock : updatePackageLock)({
+        lockFileName,
+        depsToForceUpdate,
+      })
   );
+
+  const finalVulnerabilities = await catchAndRetry(async () => {
+    console.log("Getting remaining vulnerable paths from snyk...");
+
+    const { stdout: finalSnykTestOut } = await exec(`snyk`, [
+      "test",
+      "--dev",
+      "--json",
+      `--file=${lockFileName}`,
+    ]);
+
+    const { vulnerabilities: finalVulnerabilities, error } = JSON.parse(
+      finalSnykTestOut
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    return finalVulnerabilities;
+  });
 
   if (finalVulnerabilities.length) {
     console.log(
@@ -145,7 +215,7 @@ const snyker = async () => {
     );
 
     unique(finalVulnerabilities.map(toId)).forEach(
-      async id => await exec(`snyk`, ["ignore", `--id=${id}`])
+      async (id) => await exec(`snyk`, ["ignore", `--id=${id}`])
     );
   }
 };
