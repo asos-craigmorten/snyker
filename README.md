@@ -54,7 +54,9 @@ This tool also does not make use of Snyk's ability to perform upgrades or patche
 
 ### Options
 
-(by default will assume to try and use a `yarn.lock` in the current working directory)
+```console
+snyker --verbose --retries 3 --lockfile package-lock.json
+```
 
 | Flag                  | Description                                                                    | Default     |
 | --------------------- | ------------------------------------------------------------------------------ | ----------- |
