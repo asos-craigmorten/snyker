@@ -15,6 +15,13 @@ Icon made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">
   - [Installation](#installation)
   - [Options](#options)
   - [Post Execution](#post-execution)
+- [Developing](#developing)
+  - [Install](#install)
+  - [Test](#test)
+    - [Integration Tests](#integration-tests)
+  - [Lint](#lint)
+- [Contributing](#contributing)
+- [Changelog](#changelog)
 
 <!-- tocstop -->
 
@@ -72,3 +79,34 @@ It is recommended that you manually perform the following to ensure that you app
 rm .snyk
 snyk wizard --dev
 ```
+
+## Developing
+
+### Install
+
+```console
+yarn install --frozen-lockfile
+```
+
+### Test
+
+#### Integration Tests
+
+```console
+yarn snyker
+yarn snyker:npm
+```
+
+### Lint
+
+```console
+yarn lint
+```
+
+## Contributing
+
+Please check out the [CONTRIBUTING](./docs/CONTRIBUTING.md) docs.
+
+## Changelog
+
+Please check out the [CHANGELOG](./docs/CHANGELOG.md) docs.

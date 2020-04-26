@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/asos-craigmorten/snyker#README",
   "scripts": {
-    "ci": "yarn lint",
+    "ci": "yarn lint && yarn snyker && yarn snyker:npm",
     "lint": "eslint ./src",
     "snyker": "bin/snyker",
     "snyker:npm": "bin/snyker --lockfile=package-lock.json",
