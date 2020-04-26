@@ -1,0 +1,31 @@
+{
+  "env": {
+    "es6": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:jest/recommended",
+    "prettier"
+  ],
+  "plugins": ["import", "jest", "prettier"],
+  "rules": {
+    "import/no-extraneous-dependencies": "error",
+    "no-underscore-dangle": "error",
+    "no-console": "off",
+    "no-empty": "off",
+    "no-useless-escape": "off",
+    "no-unused-vars": "off",
+    "import/prefer-default-export": "off",
+    "import/no-named-as-default": "off",
+    "linebreak-style": "off",
+    "prettier/prettier": "error",
+    "complexity": "off",
+    "import/unambiguous": "off",
+    "prefer-const": "error",
+    "no-var": "error",
+    "jest/no-identical-title": "warn"
+  }
+}

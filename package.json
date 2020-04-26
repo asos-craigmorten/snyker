@@ -1,17 +1,47 @@
 {
   "name": "snyker",
   "version": "1.0.0",
+  "description": "An opinionated, heavy-handed wrapper around Snyk.",
   "main": "index.js",
   "bin": "bin/snyker",
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asos-craigmorten/snyker.git"
+  },
+  "keywords": [
+    "snyk",
+    "security",
+    "vulnerabilities"
+  ],
+  "author": "Craig Morten <craig.morten@asos.com>",
+  "bugs": {
+    "url": "https://github.com/asos-craigmorten/snyker/issues"
+  },
+  "homepage": "https://github.com/asos-craigmorten/snyker#README",
   "scripts": {
+    "ci": "yarn lint",
+    "lint": "eslint ./src",
     "snyker": "bin/snyker",
-    "snyker:npm": "bin/snyker --lockfile=package-lock.json"
+    "snyker:npm": "bin/snyker --lockfile=package-lock.json",
+    "toc": "yarn toc:contributing && yarn toc:readme",
+    "toc:contributing": "markdown-toc -i --bullets=\"-\" docs/CONTRIBUTING.md",
+    "toc:readme": "markdown-toc -i --bullets=\"-\" README.md",
+    "prepublishOnly": "yarn ci"
   },
   "dependencies": {
     "@yarnpkg/lockfile": "^1.1.0",
     "js-yaml": "^3.13.1",
     "snyk": "^1.251.0",
     "yargs": "^15.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^23.8.2",
+    "eslint-plugin-prettier": "^3.1.3",
+    "markdown-toc": "^1.2.0",
+    "prettier": "^2.0.5"
   }
 }
