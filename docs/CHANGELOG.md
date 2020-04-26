@@ -6,6 +6,7 @@
 
 - Added `yarn snyker` and `yarn snyker:npm` to `yarn ci` to add integration testing.
 - Touch-ups to the Docs.
+- Add auth token to CI.
 
 ## [1.0.0] - 26-04-2020
 
