@@ -2,12 +2,12 @@
 version: v1.13.5
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  SNYK-JS-AUTOLINKER-564438:
-    - '*':
-        reason: None Given
-        expires: 2020-05-26T20:41:15.627Z
   SNYK-JS-AUTOLINKER-73494:
     - '*':
         reason: None Given
-        expires: 2020-05-26T20:41:15.736Z
+        expires: 2020-05-27T08:21:03.999Z
+  SNYK-JS-AUTOLINKER-564438:
+    - '*':
+        reason: None Given
+        expires: 2020-05-27T08:21:04.009Z
 patch: {}

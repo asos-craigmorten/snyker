@@ -1,6 +1,6 @@
 const { spawn } = require("child_process");
 const fs = require("fs");
-const lockfile = require("@yarnpkg/lockfile");
+const { parse, stringify } = require("@yarnpkg/lockfile");
 const { argv } = require("yargs");
 
 const DEFAULT_RETRIES = 2;
@@ -80,7 +80,7 @@ const updateYarnLock = async ({ lockFileName, depsToForceUpdate }) => {
   console.log(`Deleting vulnerable paths from '${lockFileName}' file...`);
 
   const yarnLock = fs.readFileSync(lockFileName, "utf8");
-  const { object } = lockfile.parse(yarnLock);
+  const { object } = parse(yarnLock);
 
   const updatedYarnLock = Object.entries(object).reduce(
     (currentJson, [dependencyName, dependencyMetadata]) =>
@@ -90,7 +90,7 @@ const updateYarnLock = async ({ lockFileName, depsToForceUpdate }) => {
     {}
   );
 
-  fs.writeFileSync(lockFileName, lockfile.stringify(updatedYarnLock));
+  fs.writeFileSync(lockFileName, stringify(updatedYarnLock));
 
   console.log(
     "Running 'yarn install --force' to force sub-dependency updates..."

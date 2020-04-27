@@ -14,3 +14,5 @@ package-lock.json
 # editor config files
 .DS_Store
 .vscode
+
+lib

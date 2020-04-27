@@ -1,5 +1,11 @@
 # ChangeLog
 
+## [1.0.2] - 27-04-2020
+
+### Added
+
+- Added Rollup for bundling / minification.
+
 ## [1.0.1] - 26-04-2020
 
 ## Updated
