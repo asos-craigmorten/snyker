@@ -56,7 +56,7 @@ This tool also does not make use of Snyk's ability to perform upgrades or patche
 1. With `npx`:
 
    ```console
-   npx https://github.com/asos-craigmorten/snyker
+   npx snyker
    ```
 
 ### Options
