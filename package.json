@@ -26,8 +26,8 @@
     "clean:lib": "rimraf lib",
     "clean:lock": "rimraf package-lock.json",
     "lint": "eslint ./src",
-    "snyker": "bin/snyker",
-    "snyker:npm": "bin/snyker --lockfile=package-lock.json && yarn clean:lock",
+    "snyker": "bin/snyker --verbose",
+    "snyker:npm": "bin/snyker --verbose --lockfile=package-lock.json && yarn clean:lock",
     "toc": "yarn toc:contributing && yarn toc:readme",
     "toc:contributing": "markdown-toc -i --bullets=\"-\" docs/CONTRIBUTING.md",
     "toc:readme": "markdown-toc -i --bullets=\"-\" README.md",
@@ -36,7 +36,7 @@
   "dependencies": {
     "@yarnpkg/lockfile": "^1.1.0",
     "js-yaml": "^3.13.1",
-    "snyk": "^1.251.0",
+    "snyk": "1.319.2",
     "yargs": "^15.3.0"
   },
   "devDependencies": {
