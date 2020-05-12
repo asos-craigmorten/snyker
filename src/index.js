@@ -169,6 +169,7 @@ const snyker = async () => {
       "--dev",
       "--json",
       `--file=${lockFileName}`,
+      "--prune-repeated-dependencies",
     ]);
 
     const { vulnerabilities, error } = JSON.parse(snykTestOut);
@@ -196,6 +197,7 @@ const snyker = async () => {
       "--dev",
       "--json",
       `--file=${lockFileName}`,
+      "--prune-repeated-dependencies",
     ]);
 
     const { vulnerabilities: finalVulnerabilities, error } = JSON.parse(

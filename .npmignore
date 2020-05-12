@@ -1,6 +1,7 @@
 *
 !bin/*
 !lib/*
+!docs/CHANGELOG.md
 !LICENSE
 !package.json
 !README.md

@@ -1,5 +1,11 @@
 # ChangeLog
 
+## [1.1.0] - 11-05-2020
+
+### Updated
+
+- `snyk test` commands to make use of the `--prune-repeated-dependencies` flag.
+
 ## [1.0.2] - 27-04-2020
 
 ### Added
@@ -8,7 +14,7 @@
 
 ## [1.0.1] - 26-04-2020
 
-## Updated
+### Updated
 
 - Added `yarn snyker` and `yarn snyker:npm` to `yarn ci` to add integration testing.
 - Touch-ups to the Docs.
