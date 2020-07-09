@@ -1,6 +1,6 @@
 # ChangeLog
 
-## [2.0.0] - 9-07-2020
+## [2.0.0] - 09-07-2020
 
 - fix: up spawned process buffer size.
 - feat: update snyker logging format.
