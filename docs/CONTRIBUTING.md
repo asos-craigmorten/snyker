@@ -34,9 +34,9 @@ Things to talk about in our first conversation:
 
 ### Branching
 
-On this project we follow mainline development (or trunk based development), and our default branch is `master`.
+On this project we follow mainline development (or trunk based development), and our default branch is `main`.
 
-Therefore you need to branch from `master` and merge into `master`.
+Therefore you need to branch from `main` and merge into `main`.
 
 We use the following convention for branch names `feature/short-description`, where short description is to have an idea what the branch is about and the `feature` part is for features, but it can vary on other kinds of issues.
 
@@ -67,7 +67,7 @@ yarn ci
 
 ## Opening a PR
 
-Once you're confident your branch is ready to review, open a PR against `master` on this repo.
+Once you're confident your branch is ready to review, open a PR against `main` on this repo.
 
 Please make sure you fill the PR template correctly.
 
