@@ -1,13 +1,14 @@
 const { spawn } = require("child_process");
 const fs = require("fs");
+const path = require("path");
 const { parse, stringify } = require("@yarnpkg/lockfile");
 const { argv } = require("yargs");
 
+const TEN_GIGABYTES = 1024 * 1024 * 1024 * 10;
+
 const DEFAULT_RETRIES = 2;
-const DEFAULT_VERBOSE = false;
 
 let MAX_RETRIES;
-let VERBOSE;
 
 const catchAndRetry = async (fn) => {
   for (let retries = 0; retries < MAX_RETRIES; retries++) {
@@ -27,29 +28,27 @@ const catchAndRetry = async (fn) => {
   process.exit(1);
 };
 
-const exec = (...args) => {
+const exec = (command, args = [], overrideOptions = {}) => {
   let stdout = "";
   let stderr = "";
 
   return new Promise((resolve, reject) => {
-    const child = spawn(...args);
-
-    child.stdout.on("data", (data) => (stdout = `${stdout}${data}`));
-    child.stderr.on("data", (data) => (stderr = `${stderr}${data}`));
-    child.on("error", (error) => {
-      if (VERBOSE) {
-        console.log({ error, stdout, stderr });
-      }
-
-      return reject({ error, stdout, stderr });
+    const child = spawn(command, args, {
+      stdio: "pipe",
+      encoding: "utf8",
+      maxBuffer: TEN_GIGABYTES,
+      ...overrideOptions,
     });
-    child.on("close", (code) => {
-      if (VERBOSE) {
-        console.log({ code, stdout, stderr });
-      }
 
-      return resolve({ code, stdout, stderr });
-    });
+    if (child.stdout) {
+      child.stdout.on("data", (data) => (stdout = `${stdout}${data}`));
+    }
+    if (child.stderr) {
+      child.stderr.on("data", (data) => (stderr = `${stderr}${data}`));
+    }
+
+    child.on("error", (error) => reject({ error }));
+    child.on("close", (code) => resolve({ code, stdout, stderr }));
   });
 };
 
@@ -65,9 +64,14 @@ const unique = (arr) => Array.from(new Set([...arr]));
 const toId = ({ id }) => id;
 
 const yarnInstall = async ({ force = false } = { force: false }) =>
-  await exec("yarn", ["install", ...(force ? ["--force"] : [])]);
+  await exec("yarn", ["install", ...(force ? ["--force"] : [])], {
+    stdio: "inherit",
+  });
 
-const npmInstall = async () => await exec("npm", ["install"]);
+const npmInstall = async () =>
+  await exec("npm", ["install"], {
+    stdio: "inherit",
+  });
 
 /**
  * updateYarnLock
@@ -77,7 +81,9 @@ const npmInstall = async () => await exec("npm", ["install"]);
  * @param { lockFileName, depsToForceUpdate } config The lockfile and dependencies to update.
  */
 const updateYarnLock = async ({ lockFileName, depsToForceUpdate }) => {
-  console.log(`Deleting vulnerable paths from '${lockFileName}' file...`);
+  console.log(
+    `[SNYKER: STEP 4]: Deleting vulnerable paths from '${lockFileName}' file.`
+  );
 
   const yarnLock = fs.readFileSync(lockFileName, "utf8");
   const { object } = parse(yarnLock);
@@ -93,7 +99,7 @@ const updateYarnLock = async ({ lockFileName, depsToForceUpdate }) => {
   fs.writeFileSync(lockFileName, stringify(updatedYarnLock));
 
   console.log(
-    "Running 'yarn install --force' to force sub-dependency updates..."
+    "[SNYKER: STEP 5]: Running 'yarn install --force' to force sub-dependency updates.\n"
   );
 
   const out = await yarnInstall({ force: true });
@@ -111,7 +117,9 @@ const updateYarnLock = async ({ lockFileName, depsToForceUpdate }) => {
  * @param { lockFileName, depsToForceUpdate } config The lockfile and dependencies to update.
  */
 const updatePackageLock = async ({ lockFileName, depsToForceUpdate }) => {
-  console.log(`Deleting vulnerable paths from '${lockFileName}' file...`);
+  console.log(
+    `[SNYKER: STEP 4]: Deleting vulnerable paths from '${lockFileName}' file.`
+  );
 
   const packageLock = fs.readFileSync(lockFileName, "utf8");
   const object = JSON.parse(packageLock);
@@ -129,7 +137,9 @@ const updatePackageLock = async ({ lockFileName, depsToForceUpdate }) => {
 
   fs.writeFileSync(lockFileName, JSON.stringify(updatedPackageLock));
 
-  console.log("Running 'npm install' to force sub-dependency updates...");
+  console.log(
+    "[SNYKER: STEP 5]: Running 'npm install' to force sub-dependency updates.\n"
+  );
 
   const out = await npmInstall();
 
@@ -139,15 +149,22 @@ const updatePackageLock = async ({ lockFileName, depsToForceUpdate }) => {
 };
 
 const snyker = async () => {
+  console.log("[SNYKER: STARTING]");
+
   MAX_RETRIES = argv.retries || DEFAULT_RETRIES;
-  VERBOSE = argv.verbose || DEFAULT_VERBOSE;
 
   const lockFileName = argv.lockfile || "yarn.lock";
   const isYarn = lockFileName.includes("yarn");
+  const snykCliPath = path.join(
+    module.path,
+    "../node_modules/snyk/dist/cli/index.js"
+  );
+
+  console.log(
+    `[SNYKER: STEP 1]: Ensuring lockfile '${lockFileName}' is up to date.\n`
+  );
 
   await catchAndRetry(async () => {
-    console.log(`Ensuring lockfile '${lockFileName}' is up to date...`);
-
     const out = await (isYarn ? yarnInstall : npmInstall)();
 
     if (out.code !== 0) {
@@ -155,16 +172,16 @@ const snyker = async () => {
     }
   });
 
-  console.log("Deleting '.snyk' file...");
+  console.log("\n[SNYKER: STEP 2]: Deleting '.snyk' file.");
 
   try {
     fs.unlinkSync(".snyk");
   } catch (_) {}
 
-  const depsToForceUpdate = await catchAndRetry(async () => {
-    console.log("Getting vulnerable paths from snyk...");
+  console.log("[SNYKER: STEP 3]: Getting vulnerable paths from Snyk.");
 
-    const { stdout: snykTestOut } = await exec(`snyk`, [
+  const depsToForceUpdate = await catchAndRetry(async () => {
+    const { stdout: snykTestOut } = await exec(snykCliPath, [
       "test",
       "--dev",
       "--json",
@@ -189,10 +206,12 @@ const snyker = async () => {
       })
   );
 
-  const finalVulnerabilities = await catchAndRetry(async () => {
-    console.log("Getting remaining vulnerable paths from snyk...");
+  console.log(
+    "\n[SNYKER: STEP 6]: Getting remaining vulnerable paths from Snyk."
+  );
 
-    const { stdout: finalSnykTestOut } = await exec(`snyk`, [
+  const finalVulnerabilities = await catchAndRetry(async () => {
+    const { stdout: finalSnykTestOut } = await exec(snykCliPath, [
       "test",
       "--dev",
       "--json",
@@ -212,14 +231,44 @@ const snyker = async () => {
   });
 
   if (finalVulnerabilities.length) {
-    console.log(
-      "Ignoring remaining vulnerable paths... It may be worth manually checking if these have patches, or breaking updates!"
-    );
+    console.log("[SNYKER: STEP 7]: Ignoring remaining vulnerabilities:\n");
+
+    const versionedPackages = [];
+
+    for (const {
+      id,
+      name,
+      version,
+      isUpgradable,
+      upgradePath,
+    } of finalVulnerabilities) {
+      console.log(`\t- [${id}]: Caused by ${name}@${version}`);
+
+      if (isUpgradable) {
+        versionedPackages.push(upgradePath.filter(Boolean)[0]);
+      }
+    }
+
+    console.log();
+
+    if (versionedPackages.length) {
+      const installCommand = isYarn ? "yarn upgrade" : "npm install";
+      const versionedPackagesStr = versionedPackages.reduce(
+        (str, versionedPackage) => `${str} ${versionedPackage}`,
+        ""
+      );
+
+      console.log(
+        `[SNYKER: RECOMMENDATION]: ${installCommand}${versionedPackagesStr}`
+      );
+    }
 
     unique(finalVulnerabilities.map(toId)).forEach(
-      async (id) => await exec(`snyk`, ["ignore", `--id=${id}`])
+      async (id) => await exec(snykCliPath, ["ignore", `--id=${id}`])
     );
   }
+
+  console.log("[SNYKER: COMPLETE]");
 };
 
 module.exports = snyker;

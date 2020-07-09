@@ -35,7 +35,7 @@ This CLI takes a brute-force approach to solving this downfall of Snyk. It purge
 
 Note that this tool obeys your defined package version ranges and therefore can't fix anything that requires a major upgrade if you are only permitting minor or patch upgrades.
 
-This tool also does not make use of Snyk's ability to perform upgrades or patches. It will simply ignore vulnerabilites that cannot be fixed in the aforementioned steps. _It is on you to sanity check anything that this tool decides to ignore._ It is recommended that you see what removing the "ignored" Snyk policies and running the `snyk wizard --dev` yeilds, as it may suggest patches or major upgrades that this wrapper doesn't (yet) consider.
+This tool also does not make use of Snyk's ability to perform upgrades or patches. It will simply ignore vulnerabilities that cannot be fixed in the aforementioned steps. _It is on you to sanity check anything that this tool decides to ignore._ It is recommended that you see what removing the "ignored" Snyk policies and running the `snyk wizard --dev` yields, as it may suggest patches or major upgrades that this wrapper doesn't (yet) consider.
 
 ## Usage
 
@@ -62,13 +62,12 @@ This tool also does not make use of Snyk's ability to perform upgrades or patche
 ### Options
 
 ```console
-snyker --verbose --retries 3 --lockfile package-lock.json
+snyker --retries 3 --lockfile package-lock.json
 ```
 
 | Flag                  | Description                                                                    | Default     |
 | --------------------- | ------------------------------------------------------------------------------ | ----------- |
 | `--lockfile <string>` | Specify the lockfile to use (e.g. `yarn.lock` or `package-lock.json`).         | `yarn.lock` |
-| `--verbose <bool>`    | Will log out the stdout / stderr of all commands that are executed internally. | `false`     |
 | `--retries <int>`     | Will set the number of times to retry logical steps of Snyker.                 | `2`         |
 
 ### Post Execution

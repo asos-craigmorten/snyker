@@ -2,13 +2,12 @@
 version: v1.14.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  SNYK-JS-LODASH-567746:
+  SNYK-JS-AUTOLINKER-564438:
     - '*':
         reason: None Given
-        expires: 2020-06-11T07:33:29.608Z
+        expires: 2020-08-08T21:19:18.560Z
   SNYK-JS-AUTOLINKER-73494:
     - '*':
         reason: None Given
-        expires: 2020-06-11T07:33:29.642Z
+        expires: 2020-08-08T21:19:20.814Z
 patch: {}
-
