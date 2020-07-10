@@ -1,6 +1,6 @@
 {
   "name": "snyker",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "An opinionated, heavy-handed wrapper around Snyk.",
   "main": "lib/index.js",
   "bin": "bin/snyker",
@@ -36,7 +36,7 @@
   "dependencies": {
     "@yarnpkg/lockfile": "^1.1.0",
     "js-yaml": "^3.13.1",
-    "snyk": "1.319.2",
+    "snyk": "1.361.3",
     "yargs": "^15.3.0"
   },
   "devDependencies": {

@@ -182,6 +182,8 @@ const snyker = async () => {
       "test",
       "--dev",
       "--json",
+      "--ignore-policy",
+      "--strict-out-of-sync=true",
       `--file=${lockFileName}`,
       "--prune-repeated-dependencies",
     ]);
@@ -212,6 +214,8 @@ const snyker = async () => {
       "test",
       "--dev",
       "--json",
+      "--ignore-policy",
+      "--strict-out-of-sync=true",
       `--file=${lockFileName}`,
       "--prune-repeated-dependencies",
     ]);

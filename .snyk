@@ -5,9 +5,9 @@ ignore:
   SNYK-JS-AUTOLINKER-564438:
     - '*':
         reason: None Given
-        expires: 2020-08-08T21:19:18.560Z
+        expires: 2020-08-09T17:05:07.608Z
   SNYK-JS-AUTOLINKER-73494:
     - '*':
         reason: None Given
-        expires: 2020-08-08T21:19:20.814Z
+        expires: 2020-08-09T17:05:07.707Z
 patch: {}

@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [2.0.3] - 10-07-2020
+
+- feat: bump snyk version to resolve truncated response issues.
+
 ## [2.0.2] - 10-07-2020
 
 - feat: bump up buffer size
