@@ -4,7 +4,7 @@ const path = require("path");
 const { parse, stringify } = require("@yarnpkg/lockfile");
 const { argv } = require("yargs");
 
-const TEN_GIGABYTES = 1024 * 1024 * 1024 * 10;
+const LARGE_BUFFER = 1024 * 1024 * 1024 * 20;
 
 const DEFAULT_RETRIES = 2;
 
@@ -36,7 +36,7 @@ const exec = (command, args = [], overrideOptions = {}) => {
     const child = spawn(command, args, {
       stdio: "pipe",
       encoding: "utf8",
-      maxBuffer: TEN_GIGABYTES,
+      maxBuffer: LARGE_BUFFER,
       ...overrideOptions,
     });
 

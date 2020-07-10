@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [2.0.2] - 10-07-2020
+
+- feat: bump up buffer size
+
 ## [2.0.1] - 10-07-2020
 
 - fix: snyk module path
