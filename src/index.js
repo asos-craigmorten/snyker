@@ -155,10 +155,7 @@ const snyker = async () => {
 
   const lockFileName = argv.lockfile || "yarn.lock";
   const isYarn = lockFileName.includes("yarn");
-  const snykCliPath = path.join(
-    module.path,
-    "../node_modules/snyk/dist/cli/index.js"
-  );
+  const snykCliPath = path.join(module.path, "../node_modules/.bin/snyk");
 
   console.log(
     `[SNYKER: STEP 1]: Ensuring lockfile '${lockFileName}' is up to date.\n`

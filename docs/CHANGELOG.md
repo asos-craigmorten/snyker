@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [2.0.1] - 10-07-2020
+
+- fix: snyk module path
+
 ## [2.0.0] - 09-07-2020
 
 - fix: up spawned process buffer size.
