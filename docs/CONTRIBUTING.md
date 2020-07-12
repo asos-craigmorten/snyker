@@ -4,20 +4,6 @@ First of all, thanks for taking the time to read this document and contributing 
 
 Please read each section carefully!
 
-## Contents
-
-<!-- toc -->
-
-- [Getting started](#getting-started)
-- [Working on your feature](#working-on-your-feature)
-  - [Branching](#branching)
-  - [Coding style](#coding-style)
-  - [Unit tests](#unit-tests)
-- [Opening a PR](#opening-a-pr)
-- [Merging and publishing](#merging-and-publishing)
-
-<!-- tocstop -->
-
 ## Getting started
 
 The first thing to do before starting to work on your feature would be to have a conversation with the codeowners about it, we may have some pointers or examples that might make your life much easier!

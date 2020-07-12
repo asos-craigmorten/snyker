@@ -1,63 +1,54 @@
-# Snyker
+<p align="center">
+  <h1 align="center">Snyker</h1>
+</p>
+<p align="center">
+An opinionated CLI wrapper around <a href=https://snyk.io/">Snyk</a> for purging vulnerabilities from Node projects
+</p>
+<p align="center">
+   <a href="https://github.com/asos-craigmorten/snyker/tags/"><img src="https://img.shields.io/github/tag/asos-craigmorten/snyker" alt="Current version" /></a>
+   <img src="https://github.com/asos-craigmorten/snyker/workflows/Test/badge.svg" alt="Current test status" />
+   <a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs are welcome" /></a>
+   <a href="https://github.com/asos-craigmorten/snyker/issues/"><img src="https://img.shields.io/github/issues/asos-craigmorten/snyker" alt="snyker issues" /></a>
+   <img src="https://img.shields.io/github/stars/asos-craigmorten/snyker" alt="snyker stars" />
+   <img src="https://img.shields.io/github/forks/asos-craigmorten/snyker" alt="snyker forks" />
+   <img src="https://img.shields.io/github/license/asos-craigmorten/snyker" alt="snyker license" />
+   <a href="https://GitHub.com/asos-craigmorten/snyker/graphs/commit-activity"><img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" alt="snyker is maintained" /></a>
+   <a href="http://hits.dwyl.com/asos-craigmorten/snyker"><img src="http://hits.dwyl.com/asos-craigmorten/snyker.svg" alt="snyker repository visit count" /></a>
+</p>
+<p align="center">
+  <i>You're not you when you've got hundreds of vulnerable paths</i>
+</p>
 
-_You're not you when you've got hundreds of vulnerable paths..._
+---
 
-![A Chocolate Snack](./snack.png)
+## Getting Started
 
-Icon made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>.
+```bash
+# Start fixing vulnerabilities straight away using NPX
+npx snyker
 
-## Contents
+# Add to your global NPM packages
+npm i -g snyker
 
-<!-- toc -->
-
-- [About](#about)
-- [Usage](#usage)
-  - [Installation](#installation)
-  - [Options](#options)
-  - [Post Execution](#post-execution)
-- [Developing](#developing)
-  - [Install](#install)
-  - [Test](#test)
-    - [Integration Tests](#integration-tests)
-  - [Lint](#lint)
-- [Contributing](#contributing)
-- [Changelog](#changelog)
-
-<!-- tocstop -->
+# Or to your global Yarn packages
+yarn global add snyker
+```
 
 ## About
 
-_An opinionated, heavy-handed CLI wrapper around [Snyk](https://snyk.io/) for `node` projects._
+The Snyk CLI is great for reporting vulnerabilities and providing top level dependency upgrades and patches, but struggles when the vulnerability rests within a nested sub-dependency. This is despite the fact that many sub-dependencies have reasonable flexibility in the version ranges they allow for their own dependencies.
 
-The Snyk CLI is great for reporting vulnerabilities and providing top level dependency upgrades and/or patches, but struggles when the vulnerability rests within a nested sub-dependency. This is despite the fact that many sub-dependencies have reasonable flexibility in the version ranges they allow for their own dependencies.
-
-This CLI takes a brute-force approach to solving this downfall of Snyk. It purges the `.snyk` file from a project, checks for vulnerable paths using Snyk, then forces `yarn` / `npm` to try to upgrade any dependency along the vulnerable paths before finally ignoring any vulnerability that cannot be fixed in the previous steps.
+This CLI takes a brute-force approach to solving this limitation of Snyk. It purges the `.snyk` file from a project, checks for vulnerable paths using Snyk, then forces `yarn` / `npm` to try to upgrade any dependency along the vulnerable paths before finally ignoring any vulnerability that cannot be fixed in the previous steps.
 
 Note that this tool obeys your defined package version ranges and therefore can't fix anything that requires a major upgrade if you are only permitting minor or patch upgrades.
 
-This tool also does not make use of Snyk's ability to perform upgrades or patches. It will simply ignore vulnerabilities that cannot be fixed in the aforementioned steps. _It is on you to sanity check anything that this tool decides to ignore._ It is recommended that you see what removing the "ignored" Snyk policies and running the `snyk wizard --dev` yields, as it may suggest patches or major upgrades that this wrapper doesn't (yet) consider.
+This tool also does not make use of Snyk's ability to perform package upgrades or inline patches. It will simply ignore vulnerabilities that cannot be fixed in the aforementioned steps. _It is on you to sanity check anything that this tool decides to ignore._
+
+Snyker will list the known vulnerabilities it has been unable to fix. If Snyk reports that there are major upgrades available to fix one or more of the outstanding vulnerabilities, Snyker will output a recommended `yarn` / `npm` command for performing the upgrade(s).
+
+It is recommended that you use this tool alongside the official Snyk wizard CLI, not replace it completely. Features such as patching are not (yet) available through Snyker.
 
 ## Usage
-
-### Installation
-
-1. With `npm`:
-
-   ```console
-   npm install --save-dev snyker
-   ```
-
-1. With `yarn`:
-
-   ```console
-   yarn add -D snyker
-   ```
-
-1. With `npx`:
-
-   ```console
-   npx snyker
-   ```
 
 ### Options
 
@@ -65,10 +56,10 @@ This tool also does not make use of Snyk's ability to perform upgrades or patche
 snyker --retries 3 --lockfile package-lock.json
 ```
 
-| Flag                  | Description                                                                    | Default     |
-| --------------------- | ------------------------------------------------------------------------------ | ----------- |
-| `--lockfile <string>` | Specify the lockfile to use (e.g. `yarn.lock` or `package-lock.json`).         | `yarn.lock` |
-| `--retries <int>`     | Will set the number of times to retry logical steps of Snyker.                 | `2`         |
+| Flag                  | Description                                                            | Default     |
+| --------------------- | ---------------------------------------------------------------------- | ----------- |
+| `--lockfile <string>` | Specify the lockfile to use (e.g. `yarn.lock` or `package-lock.json`). | `yarn.lock` |
+| `--retries <int>`     | Will set the number of times to retry logical steps of Snyker.         | `2`         |
 
 ### Post Execution
 
@@ -79,29 +70,6 @@ rm .snyk
 snyk wizard --dev
 ```
 
-## Developing
-
-### Install
-
-```console
-yarn install --frozen-lockfile
-```
-
-### Test
-
-#### Integration Tests
-
-```console
-yarn snyker
-yarn snyker:npm
-```
-
-### Lint
-
-```console
-yarn lint
-```
-
 ## Contributing
 
 Please check out the [CONTRIBUTING](./docs/CONTRIBUTING.md) docs.
@@ -109,3 +77,9 @@ Please check out the [CONTRIBUTING](./docs/CONTRIBUTING.md) docs.
 ## Changelog
 
 Please check out the [CHANGELOG](./docs/CHANGELOG.md) docs.
+
+---
+
+## License
+
+Snyker is licensed under the [MIT License](./LICENSE.md).

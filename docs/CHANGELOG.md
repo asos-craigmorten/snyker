@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [2.0.4] - 12-07-2020
+
+- docs: add code of conduct, security doc and some other doc tidy-up.
+
 ## [2.0.3] - 10-07-2020
 
 - feat: bump snyk version to resolve truncated response issues.
