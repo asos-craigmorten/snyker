@@ -61,8 +61,6 @@ const toDependencies = (
 
 const unique = (arr) => Array.from(new Set([...arr]));
 
-const toId = ({ id }) => id;
-
 const yarnInstall = async ({ force = false } = { force: false }) =>
   await exec(
     "yarn",
@@ -246,39 +244,40 @@ const snyker = async () => {
   if (finalVulnerabilities.length) {
     console.log("[SNYKER: STEP 7]: Ignoring remaining vulnerabilities:\n");
 
-    const versionedPackages = [];
+    const upgradablePackages = [];
+    const vulnerabilityIds = [];
 
-    for (const {
-      id,
-      name,
-      version,
-      isUpgradable,
-      upgradePath,
-    } of finalVulnerabilities) {
-      console.log(`\t- [${id}]: Caused by ${name}@${version}`);
+    for (const { id, isUpgradable, upgradePath } of finalVulnerabilities) {
+      vulnerabilityIds.push(id);
 
       if (isUpgradable) {
-        versionedPackages.push(upgradePath.filter(Boolean)[0]);
+        upgradablePackages.push(upgradePath.filter(Boolean)[0]);
       }
     }
 
+    const uniqueVulnerabilityIds = unique(vulnerabilityIds);
+    uniqueVulnerabilityIds.forEach((id) => console.log(`\t- ${id}`));
+    // Intentional newline
     console.log();
 
-    if (versionedPackages.length) {
+    uniqueVulnerabilityIds.forEach(
+      async (id) =>
+        await exec(snykCliPath, ["ignore", `--id=${id}`], {
+          stdio: "inherit",
+        })
+    );
+
+    if (upgradablePackages.length) {
       const installCommand = isYarn ? "yarn upgrade" : "npm install";
-      const versionedPackagesStr = versionedPackages.reduce(
-        (str, versionedPackage) => `${str} ${versionedPackage}`,
+      const upgradablePackagesStr = unique(upgradablePackages).reduce(
+        (str, package) => `${str} ${package}`,
         ""
       );
 
       console.log(
-        `[SNYKER: RECOMMENDATION]: ${installCommand}${versionedPackagesStr}`
+        `[SNYKER: RECOMMENDATION]: ${installCommand}${upgradablePackagesStr}`
       );
     }
-
-    unique(finalVulnerabilities.map(toId)).forEach(
-      async (id) => await exec(snykCliPath, ["ignore", `--id=${id}`])
-    );
   }
 
   console.log("[SNYKER: COMPLETE]");

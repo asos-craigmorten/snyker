@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [2.0.6] - 16-07-2020
+
+- fix: remove duplicates from vulnerability listing and upgrade recommendation command.
+
 ## [2.0.5] - 16-07-2020
 
 - fix: use `module.id` as back-compatible API for old versions of Node.
