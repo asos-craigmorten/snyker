@@ -270,7 +270,7 @@ const snyker = async () => {
     if (upgradablePackages.length) {
       const installCommand = isYarn ? "yarn upgrade" : "npm install";
       const upgradablePackagesStr = unique(upgradablePackages).reduce(
-        (str, package) => `${str} ${package}`,
+        (str, upgradablePackage) => `${str} ${upgradablePackage}`,
         ""
       );
 
