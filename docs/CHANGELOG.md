@@ -1,5 +1,11 @@
 # ChangeLog
 
+## [2.0.7] - 16-07-2020
+
+- fix: add handling of npm 5.0 EINTEGRITY problems with sha1.
+- feat: use force with second `npm install`.
+- revert: logging of `snyk ignore` to inherited stdio.
+
 ## [2.0.6] - 16-07-2020
 
 - fix: remove duplicates from vulnerability listing and upgrade recommendation command.

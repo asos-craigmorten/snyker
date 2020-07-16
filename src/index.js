@@ -75,8 +75,8 @@ const yarnInstall = async ({ force = false } = { force: false }) =>
     }
   );
 
-const npmInstall = async () =>
-  await exec("npm", ["install"], {
+const npmInstall = async ({ force = false } = { force: false }) =>
+  await exec("npm", ["install", ...(force ? ["--force"] : [])], {
     stdio: "inherit",
   });
 
@@ -117,6 +117,26 @@ const updateYarnLock = async ({ lockFileName, depsToForceUpdate }) => {
 };
 
 /**
+ * In order to avoid the ~2018 EINTEGRITY error nightmare, we also force all deps
+ * installed prior to npm 5.0 to be updated.
+ */
+const shaPatch = ({ integrity, dependencies, ...rest }) => ({
+  ...rest,
+  ...(!integrity || integrity.startsWith("sha1-") ? {} : { integrity }),
+  ...(dependencies
+    ? {
+        dependencies: Object.entries(dependencies).reduce(
+          (currentDependencies, [dependencyName, dependency]) => ({
+            ...currentDependencies,
+            [dependencyName]: shaPatch(dependency),
+          }),
+          {}
+        ),
+      }
+    : {}),
+});
+
+/**
  * updatePackageLock
  *
  * Updates a NPM `package-lock.json` to resolve vulnerabilities with dependencies.
@@ -137,18 +157,21 @@ const updatePackageLock = async ({ lockFileName, depsToForceUpdate }) => {
       (currentJson, [dependencyName, dependencyMetadata]) =>
         depsToForceUpdate.includes(toVersionless(dependencyName))
           ? currentJson
-          : { ...currentJson, [dependencyName]: dependencyMetadata },
+          : { ...currentJson, [dependencyName]: shaPatch(dependencyMetadata) },
       {}
     ),
   };
 
-  fs.writeFileSync(lockFileName, JSON.stringify(updatedPackageLock));
+  fs.writeFileSync(
+    lockFileName,
+    JSON.stringify(updatedPackageLock, undefined, 2)
+  );
 
   console.log(
     "[SNYKER: STEP 5]: Running 'npm install' to force sub-dependency updates.\n"
   );
 
-  const out = await npmInstall();
+  const out = await npmInstall({ force: true });
 
   if (out.code !== 0) {
     throw out;
@@ -261,10 +284,7 @@ const snyker = async () => {
     console.log();
 
     uniqueVulnerabilityIds.forEach(
-      async (id) =>
-        await exec(snykCliPath, ["ignore", `--id=${id}`], {
-          stdio: "inherit",
-        })
+      async (id) => await exec(snykCliPath, ["ignore", `--id=${id}`])
     );
 
     if (upgradablePackages.length) {
