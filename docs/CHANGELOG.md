@@ -1,5 +1,10 @@
 # ChangeLog
 
+## [2.0.5] - 16-07-2020
+
+- fix: use `module.id` as back-compatible API for old versions of Node.
+- feat: add `--ignore-engines` and `--ignore-platform` so doesn't fail on Node 8 and 10 with `yarn`.
+
 ## [2.0.4] - 12-07-2020
 
 - docs: add code of conduct, security doc and some other doc tidy-up.

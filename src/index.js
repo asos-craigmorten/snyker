@@ -64,9 +64,18 @@ const unique = (arr) => Array.from(new Set([...arr]));
 const toId = ({ id }) => id;
 
 const yarnInstall = async ({ force = false } = { force: false }) =>
-  await exec("yarn", ["install", ...(force ? ["--force"] : [])], {
-    stdio: "inherit",
-  });
+  await exec(
+    "yarn",
+    [
+      "install",
+      "--ignore-engines",
+      "--ignore-platform",
+      ...(force ? ["--force"] : []),
+    ],
+    {
+      stdio: "inherit",
+    }
+  );
 
 const npmInstall = async () =>
   await exec("npm", ["install"], {
@@ -155,7 +164,10 @@ const snyker = async () => {
 
   const lockFileName = argv.lockfile || "yarn.lock";
   const isYarn = lockFileName.includes("yarn");
-  const snykCliPath = path.join(module.path, "../node_modules/.bin/snyk");
+  const snykCliPath = path.join(
+    path.dirname(module.id),
+    "../node_modules/.bin/snyk"
+  );
 
   console.log(
     `[SNYKER: STEP 1]: Ensuring lockfile '${lockFileName}' is up to date.\n`
