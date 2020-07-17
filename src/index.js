@@ -2,6 +2,7 @@ const { spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { parse, stringify } = require("@yarnpkg/lockfile");
+const yaml = require("js-yaml");
 const { argv } = require("yargs");
 
 const LARGE_BUFFER = 1024 * 1024 * 1024 * 20;
@@ -178,6 +179,35 @@ const updatePackageLock = async ({ lockFileName, depsToForceUpdate }) => {
   }
 };
 
+const updateSnykPolicyPatches = (patchablePackages) => {
+  const snykPolicyFile = fs.existsSync(".snyk")
+    ? fs.readFileSync(".snyk", "utf8")
+    : "ignore: {}\npatch: {}";
+
+  const policy = yaml.load(snykPolicyFile);
+
+  const updatedPolicy = {
+    ...policy,
+    patch: patchablePackages.reduce(
+      (currentPatch, { id, from }) => ({
+        ...currentPatch,
+        [id]: [
+          ...(currentPatch[id] || []),
+          {
+            [from.map(toVersionless).join(" > ")]: {
+              patched: new Date().toISOString(),
+            },
+          },
+        ],
+      }),
+      {}
+    ),
+  };
+
+  const updatedPolicyFile = yaml.safeDump(updatedPolicy);
+  fs.writeFileSync(".snyk", updatedPolicyFile);
+};
+
 const snyker = async () => {
   console.log("[SNYKER: STARTING]");
 
@@ -265,27 +295,37 @@ const snyker = async () => {
   });
 
   if (finalVulnerabilities.length) {
-    console.log("[SNYKER: STEP 7]: Ignoring remaining vulnerabilities:\n");
-
     const upgradablePackages = [];
+    const patchablePackages = [];
     const vulnerabilityIds = [];
 
-    for (const { id, isUpgradable, upgradePath } of finalVulnerabilities) {
+    for (const {
+      id,
+      from,
+      isUpgradable,
+      isPatchable,
+      upgradePath,
+    } of finalVulnerabilities) {
       vulnerabilityIds.push(id);
 
       if (isUpgradable) {
         upgradablePackages.push(upgradePath.filter(Boolean)[0]);
       }
+      if (isPatchable) {
+        patchablePackages.push({ id, from });
+      }
     }
+
+    console.log("[SNYKER: STEP 7]: Ignoring remaining vulnerabilities:\n");
 
     const uniqueVulnerabilityIds = unique(vulnerabilityIds);
     uniqueVulnerabilityIds.forEach((id) => console.log(`\t- ${id}`));
     // Intentional newline
     console.log();
 
-    uniqueVulnerabilityIds.forEach(
-      async (id) => await exec(snykCliPath, ["ignore", `--id=${id}`])
-    );
+    for (const id of uniqueVulnerabilityIds) {
+      await exec(snykCliPath, ["ignore", `--id=${id}`]);
+    }
 
     if (upgradablePackages.length) {
       const installCommand = isYarn ? "yarn upgrade" : "npm install";
@@ -297,6 +337,17 @@ const snyker = async () => {
       console.log(
         `[SNYKER: RECOMMENDATION]: ${installCommand}${upgradablePackagesStr}`
       );
+    }
+
+    if (patchablePackages.length) {
+      console.log("[SNYKER: STEP 8]: Applying available patches:\n");
+
+      unique(patchablePackages.map(({ id }) => id)).forEach((id) =>
+        console.log(`\t- ${id}`)
+      );
+      // Intentional newline
+      console.log();
+      updateSnykPolicyPatches(patchablePackages);
     }
   }
 

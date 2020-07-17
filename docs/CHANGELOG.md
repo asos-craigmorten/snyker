@@ -1,5 +1,10 @@
 # ChangeLog
 
+## [3.0.0] - 17-07-2020
+
+- feat: automatically apply available patches when outstanding vulnerabilities.
+- fix: ensure `snyk ignore` is awaited properly before proceeding.
+
 ## [2.0.7] - 16-07-2020
 
 - fix: add handling of npm 5.0 EINTEGRITY problems with sha1.

@@ -38,15 +38,15 @@ yarn global add snyker
 
 The Snyk CLI is great for reporting vulnerabilities and providing top level dependency upgrades and patches, but struggles when the vulnerability rests within a nested sub-dependency. This is despite the fact that many sub-dependencies have reasonable flexibility in the version ranges they allow for their own dependencies.
 
-This CLI takes a brute-force approach to solving this limitation of Snyk. It purges the `.snyk` file from a project, checks for vulnerable paths using Snyk, then forces `yarn` / `npm` to try to upgrade any dependency along the vulnerable paths before finally ignoring any vulnerability that cannot be fixed in the previous steps.
+This CLI takes a brute-force approach to solving this limitation of Snyk. It purges the `.snyk` file from a project, checks for vulnerable paths using Snyk, then forces `yarn` / `npm` to try to upgrade any dependency along the vulnerable paths before finally ignoring any vulnerability that cannot be fixed in the previous steps. If a patch is available for any outstanding vulnerability then it is also added to the Snyk policy.
 
 Note that this tool obeys your defined package version ranges and therefore can't fix anything that requires a major upgrade if you are only permitting minor or patch upgrades.
 
-This tool also does not make use of Snyk's ability to perform package upgrades or inline patches. It will simply ignore vulnerabilities that cannot be fixed in the aforementioned steps. _It is on you to sanity check anything that this tool decides to ignore._
+This tool also does not make use of Snyk's ability to perform package major upgrades. It will simply ignore vulnerabilities that cannot be fixed in the aforementioned steps. _It is on you to sanity check anything that this tool decides to ignore._
 
 Snyker will list the known vulnerabilities it has been unable to fix. If Snyk reports that there are major upgrades available to fix one or more of the outstanding vulnerabilities, Snyker will output a recommended `yarn` / `npm` command for performing the upgrade(s).
 
-It is recommended that you use this tool alongside the official Snyk wizard CLI, not replace it completely. Features such as patching are not (yet) available through Snyker.
+It is recommended that you use this tool alongside the official Snyk wizard CLI, not replace it completely.
 
 ## Usage
 
@@ -63,7 +63,7 @@ snyker --retries 3 --lockfile package-lock.json
 
 ### Post Execution
 
-It is recommended that you manually perform the following to ensure that you apply any patches or upgrades that are available and currently unsupported by this CLI.
+It is recommended that you manually perform the following to ensure that you apply any upgrades that are available and currently unsupported by this CLI.
 
 ```console
 rm .snyk
