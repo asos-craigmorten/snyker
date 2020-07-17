@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [3.0.1] - 17-07-2020
+
+- fix: patch paths shouldn't include repo itself.
+
 ## [3.0.0] - 17-07-2020
 
 - feat: automatically apply available patches when outstanding vulnerabilities.

@@ -194,7 +194,7 @@ const updateSnykPolicyPatches = (patchablePackages) => {
         [id]: [
           ...(currentPatch[id] || []),
           {
-            [from.map(toVersionless).join(" > ")]: {
+            [from.slice(1).map(toVersionless).join(" > ")]: {
               patched: new Date().toISOString(),
             },
           },
