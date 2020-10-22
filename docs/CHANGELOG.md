@@ -1,5 +1,10 @@
 # ChangeLog
 
+## [3.1.0] - 22-10-2020
+
+- build(deps): bump bl from 4.0.2 to 4.0.3 (#3)
+- feat: upgrade snyk dependency
+
 ## [3.0.1] - 17-07-2020
 
 - fix: patch paths shouldn't include repo itself.
