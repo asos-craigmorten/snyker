@@ -33,7 +33,7 @@
   "dependencies": {
     "@yarnpkg/lockfile": "^1.1.0",
     "js-yaml": "^3.14.0",
-    "snyk": "1.361.3",
+    "snyk": "^1.419.1",
     "yargs": "^15.3.0"
   },
   "devDependencies": {
