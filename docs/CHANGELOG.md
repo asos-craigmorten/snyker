@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [3.2.0] - 24-03-2021
+
+- chore: upgrade snyk dependency
+
 ## [3.1.0] - 22-10-2020
 
 - build(deps): bump bl from 4.0.2 to 4.0.3 (#3)
