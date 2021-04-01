@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [3.3.0] - 01-03-2021
+
+- feat: honour previous `created` and `reason` fields for a vulnerability
+
 ## [3.2.0] - 24-03-2021
 
 - chore: upgrade snyk dependency

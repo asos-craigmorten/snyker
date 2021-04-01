@@ -208,6 +208,58 @@ const updateSnykPolicyPatches = (patchablePackages) => {
   fs.writeFileSync(".snyk", updatedPolicyFile);
 };
 
+const dynamicPolicyKeys = ["expires"];
+
+const updateSnykPolicyWithPersistedVulnerabilityData = (originalPolicy) => {
+  const snykPolicyFile = fs.existsSync(".snyk")
+    ? fs.readFileSync(".snyk", "utf8")
+    : "ignore: {}\npatch: {}";
+
+  const policy = yaml.load(snykPolicyFile);
+
+  const updatedPolicy = {
+    ...policy,
+    ignore: Object.entries(policy.ignore).reduce(
+      (currentIgnore, [id, vulnerablePaths]) => {
+        const originalVulnerablePaths = originalPolicy.ignore[id] || [];
+
+        let originalMetadata = {};
+
+        if (originalVulnerablePaths.length && originalVulnerablePaths[0]["*"]) {
+          originalMetadata = Object.entries(
+            originalVulnerablePaths[0]["*"]
+          ).reduce((metadata, [key, value]) => {
+            if (dynamicPolicyKeys.includes(key)) {
+              return metadata;
+            }
+
+            return {
+              ...metadata,
+              [key]: value,
+            };
+          }, {});
+        }
+
+        return {
+          ...currentIgnore,
+          [id]: [
+            {
+              "*": {
+                ...vulnerablePaths[0]["*"],
+                ...originalMetadata,
+              },
+            },
+          ],
+        };
+      },
+      {}
+    ),
+  };
+
+  const updatedPolicyFile = yaml.safeDump(updatedPolicy);
+  fs.writeFileSync(".snyk", updatedPolicyFile);
+};
+
 const snyker = async () => {
   console.log("[SNYKER: STARTING]");
 
@@ -233,6 +285,17 @@ const snyker = async () => {
   });
 
   console.log("\n[SNYKER: STEP 2]: Deleting '.snyk' file.");
+
+  /**
+   * We need to make sure that we persist any metadata about when vulnerabilities
+   * were first reported etc. so we cache the original policy file before removing
+   * it.
+   */
+  const snykPolicyFile = fs.existsSync(".snyk")
+    ? fs.readFileSync(".snyk", "utf8")
+    : "ignore: {}\npatch: {}";
+
+  const originalPolicy = yaml.load(snykPolicyFile);
 
   try {
     fs.unlinkSync(".snyk");
@@ -350,6 +413,8 @@ const snyker = async () => {
       updateSnykPolicyPatches(patchablePackages);
     }
   }
+
+  updateSnykPolicyWithPersistedVulnerabilityData(originalPolicy);
 
   console.log("[SNYKER: COMPLETE]");
 };
