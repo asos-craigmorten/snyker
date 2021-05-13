@@ -15,7 +15,7 @@ const catchAndRetry = async (fn) => {
   for (let retries = 0; retries < MAX_RETRIES; retries++) {
     try {
       return await fn();
-    } catch (e) {    
+    } catch (e) {
       console.log("An error was thrown while executing the previous command.");
       console.error(e);
     }
@@ -315,7 +315,6 @@ const snyker = async () => {
       `--file=${lockFileName}`,
       "--prune-repeated-dependencies",
     ]);
-
 
     if(snykAuthCheck(snykTestOut)){
       console.log("\nMissingApiTokenError: `snyk` requires an authenticated account. Please run `snyk auth` and try again.\n\nRestoring Original Snyk Policy.");
