@@ -15,7 +15,7 @@ const catchAndRetry = async (fn) => {
   for (let retries = 0; retries < MAX_RETRIES; retries++) {
     try {
       return await fn();
-    } catch (e) {
+    } catch (e) {    
       console.log("An error was thrown while executing the previous command.");
       console.error(e);
     }
@@ -126,14 +126,14 @@ const shaPatch = ({ integrity, dependencies, ...rest }) => ({
   ...(!integrity || integrity.startsWith("sha1-") ? {} : { integrity }),
   ...(dependencies
     ? {
-        dependencies: Object.entries(dependencies).reduce(
-          (currentDependencies, [dependencyName, dependency]) => ({
-            ...currentDependencies,
-            [dependencyName]: shaPatch(dependency),
-          }),
-          {}
-        ),
-      }
+      dependencies: Object.entries(dependencies).reduce(
+        (currentDependencies, [dependencyName, dependency]) => ({
+          ...currentDependencies,
+          [dependencyName]: shaPatch(dependency),
+        }),
+        {}
+      ),
+    }
     : {}),
 });
 
@@ -260,6 +260,13 @@ const updateSnykPolicyWithPersistedVulnerabilityData = (originalPolicy) => {
   fs.writeFileSync(".snyk", updatedPolicyFile);
 };
 
+const snykAuthCheck = snykPayload => {
+  if (snykPayload.startsWith("MissingApiTokenError")) {
+    console.log("\nMissingApiTokenError: `snyk` requires an authenticated account. Please run `snyk auth` and try again.\n");
+    process.exit(1);
+  }
+}
+
 const snyker = async () => {
   console.log("[SNYKER: STARTING]");
 
@@ -314,9 +321,12 @@ const snyker = async () => {
       "--prune-repeated-dependencies",
     ]);
 
+
+    snykAuthCheck(snykTestOut);
+
     const { vulnerabilities, error } = JSON.parse(snykTestOut);
 
-    if (error) {
+    if(error){
       throw error;
     }
 
@@ -345,6 +355,8 @@ const snyker = async () => {
       `--file=${lockFileName}`,
       "--prune-repeated-dependencies",
     ]);
+
+    snykAuthCheck(finalSnykTestOut);
 
     const { vulnerabilities: finalVulnerabilities, error } = JSON.parse(
       finalSnykTestOut

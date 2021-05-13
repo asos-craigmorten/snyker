@@ -1,6 +1,6 @@
 {
   "name": "snyker",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "An opinionated, heavy-handed wrapper around Snyk.",
   "main": "lib/index.js",
   "bin": "bin/snyker",
