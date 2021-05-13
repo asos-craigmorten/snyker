@@ -260,12 +260,7 @@ const updateSnykPolicyWithPersistedVulnerabilityData = (originalPolicy) => {
   fs.writeFileSync(".snyk", updatedPolicyFile);
 };
 
-const snykAuthCheck = snykPayload => {
-  if (snykPayload.startsWith("MissingApiTokenError")) {
-    console.log("\nMissingApiTokenError: `snyk` requires an authenticated account. Please run `snyk auth` and try again.\n");
-    process.exit(1);
-  }
-}
+const snykAuthCheck = snykPayload => snykPayload.startsWith("MissingApiTokenError");
 
 const snyker = async () => {
   console.log("[SNYKER: STARTING]");
@@ -322,7 +317,11 @@ const snyker = async () => {
     ]);
 
 
-    snykAuthCheck(snykTestOut);
+    if(snykAuthCheck(snykTestOut)){
+      console.log("\nMissingApiTokenError: `snyk` requires an authenticated account. Please run `snyk auth` and try again.\n\nRestoring Original Snyk Policy.");
+      fs.writeFileSync(".snyk", yaml.safeDump(originalPolicy));
+      process.exit(1);
+    };
 
     const { vulnerabilities, error } = JSON.parse(snykTestOut);
 
@@ -356,7 +355,11 @@ const snyker = async () => {
       "--prune-repeated-dependencies",
     ]);
 
-    snykAuthCheck(finalSnykTestOut);
+    if(snykAuthCheck(finalSnykTestOut)){
+      console.log("\nMissingApiTokenError: `snyk` requires an authenticated account. Please run `snyk auth` and try again.\n\nRestoring Original Snyk Policy.");
+      fs.writeFileSync(".snyk", yaml.safeDump(originalPolicy));
+      process.exit(1);
+    };
 
     const { vulnerabilities: finalVulnerabilities, error } = JSON.parse(
       finalSnykTestOut
