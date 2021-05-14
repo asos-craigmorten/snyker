@@ -126,14 +126,14 @@ const shaPatch = ({ integrity, dependencies, ...rest }) => ({
   ...(!integrity || integrity.startsWith("sha1-") ? {} : { integrity }),
   ...(dependencies
     ? {
-      dependencies: Object.entries(dependencies).reduce(
-        (currentDependencies, [dependencyName, dependency]) => ({
-          ...currentDependencies,
-          [dependencyName]: shaPatch(dependency),
-        }),
-        {}
-      ),
-    }
+        dependencies: Object.entries(dependencies).reduce(
+          (currentDependencies, [dependencyName, dependency]) => ({
+            ...currentDependencies,
+            [dependencyName]: shaPatch(dependency),
+          }),
+          {}
+        ),
+      }
     : {}),
 });
 
@@ -260,7 +260,8 @@ const updateSnykPolicyWithPersistedVulnerabilityData = (originalPolicy) => {
   fs.writeFileSync(".snyk", updatedPolicyFile);
 };
 
-const snykAuthCheck = snykPayload => snykPayload.startsWith("MissingApiTokenError");
+const snykAuthCheck = (snykPayload) =>
+  snykPayload.startsWith("MissingApiTokenError");
 
 const snyker = async () => {
   console.log("[SNYKER: STARTING]");
@@ -316,15 +317,17 @@ const snyker = async () => {
       "--prune-repeated-dependencies",
     ]);
 
-    if(snykAuthCheck(snykTestOut)){
-      console.log("\nMissingApiTokenError: `snyk` requires an authenticated account. Please run `snyk auth` and try again.\n\nRestoring Original Snyk Policy.");
+    if (snykAuthCheck(snykTestOut)) {
+      console.log(
+        "\nMissingApiTokenError: `snyk` requires an authenticated account. Please run `snyk auth` and try again.\n\nRestoring Original Snyk Policy."
+      );
       fs.writeFileSync(".snyk", yaml.safeDump(originalPolicy));
       process.exit(1);
-    };
+    }
 
     const { vulnerabilities, error } = JSON.parse(snykTestOut);
 
-    if(error){
+    if (error) {
       throw error;
     }
 
@@ -354,11 +357,13 @@ const snyker = async () => {
       "--prune-repeated-dependencies",
     ]);
 
-    if(snykAuthCheck(finalSnykTestOut)){
-      console.log("\nMissingApiTokenError: `snyk` requires an authenticated account. Please run `snyk auth` and try again.\n\nRestoring Original Snyk Policy.");
+    if (snykAuthCheck(finalSnykTestOut)) {
+      console.log(
+        "\nMissingApiTokenError: `snyk` requires an authenticated account. Please run `snyk auth` and try again.\n\nRestoring Original Snyk Policy."
+      );
       fs.writeFileSync(".snyk", yaml.safeDump(originalPolicy));
       process.exit(1);
-    };
+    }
 
     const { vulnerabilities: finalVulnerabilities, error } = JSON.parse(
       finalSnykTestOut
