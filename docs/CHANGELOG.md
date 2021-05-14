@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [3.4.0] - 13-05-2021
+
+- feat: snyk authentication errors are now captured and logged specifically
+
 ## [3.3.0] - 01-03-2021
 
 - feat: honour previous `created` and `reason` fields for a vulnerability
