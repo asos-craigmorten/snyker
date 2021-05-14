@@ -1,8 +1,8 @@
 version: v1.19.0
 ignore:
-  SNYK-JS-HOSTEDGITINFO-1088355:
+  SNYK-JS-PATHPARSE-1077067:
     - '*':
         reason: None Given
-        expires: 2021-05-01T15:39:39.474Z
-        created: 2021-03-24T16:34:12.111Z
+        expires: 2021-06-13T08:06:16.339Z
+        created: 2021-05-14T08:05:55.127Z
 patch: {}
