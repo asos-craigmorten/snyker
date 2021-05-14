@@ -13,7 +13,6 @@ An opinionated CLI wrapper around <a href=https://snyk.io/">Snyk</a> for purging
    <img src="https://img.shields.io/github/forks/asos-craigmorten/snyker" alt="snyker forks" />
    <img src="https://img.shields.io/github/license/asos-craigmorten/snyker" alt="snyker license" />
    <a href="https://GitHub.com/asos-craigmorten/snyker/graphs/commit-activity"><img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" alt="snyker is maintained" /></a>
-   <a href="http://hits.dwyl.com/asos-craigmorten/snyker"><img src="http://hits.dwyl.com/asos-craigmorten/snyker.svg" alt="snyker repository visit count" /></a>
 </p>
 <p align="center">
   <i>You're not you when you've got hundreds of vulnerable paths</i>
